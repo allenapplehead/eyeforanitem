@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'my_node = image_collector.my_node:main'
+            'collect = image_collector.collect:main'
         ],
     },
 )
