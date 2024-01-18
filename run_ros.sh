@@ -52,7 +52,7 @@ if [ "$ARCH" = "aarch64" ]; then
         --device /dev/bus/usb \
         $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE \
         -v $(pwd)/robot_ws:/robot_ws \
-        ros "$@"
+        dustynv/ros:iron-desktop-l4t-r35.2.1 "$@"
 
 elif [ "$ARCH" = "x86_64" ]; then
     set -x
@@ -64,5 +64,5 @@ elif [ "$ARCH" = "x86_64" ]; then
         --volume $ROOT/data:/data \
         $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE \
         -v $(pwd)/robot_ws:/robot_ws \
-        ros "$@"
+        dustynv/ros:iron-desktop-l4t-r35.2.1 "$@"
 fi
