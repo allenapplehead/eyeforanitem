@@ -1,2 +1,0 @@
-[console_scripts]
-my_node = image_collector.my_node:main
