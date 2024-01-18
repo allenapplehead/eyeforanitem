@@ -1,4 +1,5 @@
 image_collector_node:
   ros__parameters:
-    capture_period: 0.1
+    capture_period: 1.0
     dataset_dir: /data/datasets/image_collector/train
+    save_imgs: True
