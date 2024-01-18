@@ -1,0 +1,4 @@
+image_collector_node:
+  ros__parameters:
+    capture_period: 0.1
+    dataset_dir: /data/datasets/image_collector/train
