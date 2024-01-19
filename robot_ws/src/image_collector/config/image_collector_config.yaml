@@ -2,4 +2,6 @@ image_collector_node:
   ros__parameters:
     capture_period: 1.0
     dataset_dir: /data/datasets/image_collector/train
+    blurry_dir: /data/datasets/image_collector/blurry
     save_imgs: True
+    blur_thres: 100.0
