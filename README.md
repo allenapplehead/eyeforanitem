@@ -7,10 +7,12 @@
   python3 -m nanodb \
     --scan /my_dataset \
     --path /my_dataset/nanodb \
-    --autosave --validate ```
+    --autosave --validate
+```
 
 ```cd jetson-containers
 ./run.sh -v ${PWD}/data/datasets/image_collector/train:/my_dataset $(./autotag nanodb) \
   python3 -m nanodb \
     --path /my_dataset/nanodb \
-    --server --port=7860```
+    --server --port=7860
+```
