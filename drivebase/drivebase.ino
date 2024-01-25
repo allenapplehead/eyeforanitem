@@ -47,14 +47,14 @@ void loop() {
         digitalWrite(PIN_IN3, HIGH);
         digitalWrite(PIN_IN4, LOW);
         analogWrite(PIN_ENA_LEFT, 255);
-        analogWrite(PIN_ENA_RIGHT, 170);
+        analogWrite(PIN_ENA_RIGHT, 125);
         break;
       case 'L': // Front Left Turn
         digitalWrite(PIN_IN1, LOW);
         digitalWrite(PIN_IN2, HIGH);
         digitalWrite(PIN_IN3, HIGH);
         digitalWrite(PIN_IN4, LOW);
-        analogWrite(PIN_ENA_LEFT, 170);
+        analogWrite(PIN_ENA_LEFT, 125);
         analogWrite(PIN_ENA_RIGHT, 255);
         break;
       case 'S': // Stop
