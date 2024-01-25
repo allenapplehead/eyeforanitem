@@ -47,12 +47,12 @@ if [ "$ARCH" = "aarch64" ]; then
         --volume /etc/enctune.conf:/etc/enctune.conf \
         --volume /etc/nv_tegra_release:/etc/nv_tegra_release \
         --volume /tmp/nv_jetson_model:/tmp/nv_jetson_model \
-        --volume $ROOT/data:/data \
+        --volume $ROOT/jetson-containers/data:/data \
         --device /dev/snd \
         --device /dev/bus/usb \
         $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE \
         -v $(pwd)/robot_ws:/robot_ws \
-        ros "$@"
+        dustynv/ros:iron-desktop-l4t-r35.2.1 "$@"
 
 elif [ "$ARCH" = "x86_64" ]; then
     set -x
@@ -61,8 +61,8 @@ elif [ "$ARCH" = "x86_64" ]; then
         --ulimit memlock=-1 \
         --ulimit stack=67108864 \
         --env NVIDIA_DRIVER_CAPABILITIES=all \
-        --volume $ROOT/data:/data \
+        --volume $ROOT/jetson-containers/data:/data \
         $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE \
         -v $(pwd)/robot_ws:/robot_ws \
-        ros "$@"
+        dustynv/ros:iron-desktop-l4t-r35.2.1 "$@"
 fi
