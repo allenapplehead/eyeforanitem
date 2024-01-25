@@ -1,81 +1,71 @@
-#define led1 13
-#define in1 4
-#define in2 5
-#define in3 3
-#define in4 2
+#include "BluetoothSerial.h"
+
+BluetoothSerial SerialBT;
+
+#define PIN_IN1  16
+#define PIN_IN2  17
+#define PIN_IN3  5
+#define PIN_IN4  18
+#define PIN_ENA_LEFT  19
+#define PIN_ENA_RIGHT  4
 
 void setup() {
   Serial.begin(9600);
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
-  pinMode(13, OUTPUT);
+  SerialBT.begin("ESP32_BT_Car"); // Bluetooth device name
+
+  pinMode(PIN_IN1, OUTPUT);
+  pinMode(PIN_IN2, OUTPUT);
+  pinMode(PIN_IN3, OUTPUT);
+  pinMode(PIN_IN4, OUTPUT);
+
+  Serial.println("The device started, now you can pair it with bluetooth!");
 }
 
 void loop() {
-  if (Serial.available() > 0) {
-    char inputvalue = char(Serial.read());
-    if (inputvalue == 'F') {
-      digitalWrite(in1, HIGH);
-      digitalWrite(in2, LOW);
-      digitalWrite(in3, HIGH);
-      digitalWrite(in4, LOW);
-    }
-    else if (inputvalue == 'G') {
-      digitalWrite(in1, LOW);
-      digitalWrite(in2, HIGH);
-      digitalWrite(in3, LOW);
-      digitalWrite(in4, HIGH);
-    }
-
-    else if (inputvalue == 'R') {
-      digitalWrite(in1, HIGH);
-      digitalWrite(in2, LOW);
-      digitalWrite(in3, LOW);
-      digitalWrite(in4, HIGH);
-    }
-
-    else if (inputvalue == 'L') {
-      digitalWrite(in1, LOW);
-      digitalWrite(in2, HIGH);
-      digitalWrite(in3, HIGH);
-      digitalWrite(in4, LOW);
-    }
-
-    else if (inputvalue == 'Q') {
-      digitalWrite(in1, LOW);
-      digitalWrite(in2, LOW);
-      digitalWrite(in3, HIGH);
-      digitalWrite(in4, LOW);
-    }
-
-    else if (inputvalue == 'E') {
-      digitalWrite(in1, HIGH);
-      digitalWrite(in2, LOW);
-      digitalWrite(in3, LOW);
-      digitalWrite(in4, LOW);
-    }
-
-    else if (inputvalue == 'C') {
-      digitalWrite(in1, LOW);
-      digitalWrite(in2, HIGH);
-      digitalWrite(in3, LOW);
-      digitalWrite(in4, LOW);
-    }
-
-    else if (inputvalue == 'Z') {
-      digitalWrite(in1, LOW);
-      digitalWrite(in2, LOW);
-      digitalWrite(in3, LOW);
-      digitalWrite(in4, HIGH);
-    }
-
-    else if (inputvalue == 'S') {
-      digitalWrite(in1, LOW);
-      digitalWrite(in2, LOW);
-      digitalWrite(in3, LOW);
-      digitalWrite(in4, LOW);
+  if (SerialBT.available()) {
+    char receivedChar = SerialBT.read();
+    switch (receivedChar) {
+      case 'F': // Forward
+        digitalWrite(PIN_IN1, LOW);
+        digitalWrite(PIN_IN2, HIGH);
+        digitalWrite(PIN_IN3, HIGH);
+        digitalWrite(PIN_IN4, LOW);
+        analogWrite(PIN_ENA_LEFT, 255);
+        analogWrite(PIN_ENA_RIGHT, 255);
+        break;
+      case 'G': // Backward
+        digitalWrite(PIN_IN1, HIGH);
+        digitalWrite(PIN_IN2, LOW);
+        digitalWrite(PIN_IN3, LOW);
+        digitalWrite(PIN_IN4, HIGH);
+        analogWrite(PIN_ENA_LEFT, 255);
+        analogWrite(PIN_ENA_RIGHT, 255);
+        break;
+      case 'R': // Front Right Turn
+        digitalWrite(PIN_IN1, LOW);
+        digitalWrite(PIN_IN2, HIGH);
+        digitalWrite(PIN_IN3, HIGH);
+        digitalWrite(PIN_IN4, LOW);
+        analogWrite(PIN_ENA_LEFT, 255);
+        analogWrite(PIN_ENA_RIGHT, 170);
+        break;
+      case 'L': // Front Left Turn
+        digitalWrite(PIN_IN1, LOW);
+        digitalWrite(PIN_IN2, HIGH);
+        digitalWrite(PIN_IN3, HIGH);
+        digitalWrite(PIN_IN4, LOW);
+        analogWrite(PIN_ENA_LEFT, 170);
+        analogWrite(PIN_ENA_RIGHT, 255);
+        break;
+      case 'S': // Stop
+        digitalWrite(PIN_IN1, LOW);
+        digitalWrite(PIN_IN2, LOW);
+        digitalWrite(PIN_IN3, LOW);
+        digitalWrite(PIN_IN4, LOW);
+        analogWrite(PIN_ENA_LEFT, 0);
+        analogWrite(PIN_ENA_RIGHT, 0);
+        break;
+      // Add more cases as needed
     }
   }
 }
