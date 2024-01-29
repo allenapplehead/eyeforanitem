@@ -16,6 +16,12 @@ if [ -e "/dev/ttyACM0" ]; then
     ARDUINO_DEVICE="--device /dev/ttyACM0"
 fi
 
+# Check for ESP32
+ESP32_DEVICE=""
+if [ -e "/dev/ttyUSB0" ]; then
+    ESP32_DEVICE="--device /dev/ttyUSB0"
+fi
+
 # Check for display (X11 forwarding)
 DISPLAY_DEVICE=""
 if [ -n "$DISPLAY" ]; then
@@ -50,8 +56,9 @@ if [ "$ARCH" = "aarch64" ]; then
         --volume $ROOT/jetson-containers/data:/data \
         --device /dev/snd \
         --device /dev/bus/usb \
-        $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE \
+        $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE $ESP32_DEVICE \
         -v $(pwd)/robot_ws:/robot_ws \
+        -v $(pwd)/microros_ws:/microros_ws \
         dustynv/ros:iron-desktop-l4t-r35.2.1 "$@"
 
 elif [ "$ARCH" = "x86_64" ]; then
@@ -62,7 +69,8 @@ elif [ "$ARCH" = "x86_64" ]; then
         --ulimit stack=67108864 \
         --env NVIDIA_DRIVER_CAPABILITIES=all \
         --volume $ROOT/jetson-containers/data:/data \
-        $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE \
+        $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE $ESP32_DEVICE \
         -v $(pwd)/robot_ws:/robot_ws \
+        -v $(pwd)/microros_ws:/microros_ws \
         dustynv/ros:iron-desktop-l4t-r35.2.1 "$@"
 fi
