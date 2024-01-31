@@ -2,6 +2,15 @@
 
 `./run_ros.sh`: enter ros2 container
 
+ESP32 serial communication
+```./run_ros.sh
+source /opt/ros/iron/install/setup.bash
+cd microros_ws
+source install/setup.bash
+ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0
+```
+
+NanoDB commands
 ```cd jetson-containers
 ./run.sh -v ${PWD}/data/datasets/image_collector/train:/my_dataset $(./autotag nanodb) \
   python3 -m nanodb \
