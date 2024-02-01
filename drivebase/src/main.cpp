@@ -5,6 +5,10 @@
 #include <rclc/executor.h>
 #include <std_msgs/msg/int32.h>
 
+#include <micro_ros_arduino.h>
+#include <basicMPU6050.h>
+#include <sensor_msgs/msg/imu.h>
+
 #if !defined(MICRO_ROS_TRANSPORT_ARDUINO_SERIAL)
 #error This example is only avaliable for Arduino framework with serial transport.
 #endif
@@ -47,10 +51,17 @@ rcl_node_t node;
 // Error handle loop
 void error_loop() {
   while(1) {
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     delay(100);
   }
 }
+
+// Create instance of MPU6050
+basicMPU6050<> imu;
+
+// ROS publisher and message
+rcl_publisher_t imu_publisher;
+sensor_msgs__msg__Imu imu_msg;
+
 
 void controlMotors(int command, int speed = 255) {
   if (command == FWD) { // forward
@@ -138,11 +149,14 @@ void subscription_callback(const void * msgin)
   controlMotors(msg->data);
 }
 
+
+// Setup function for micro-ROS
 void setup() {
   // Configure serial transport
   Serial.begin(115200);
   set_microros_serial_transports(Serial);
 
+  // Port definitions for motors (and LED for debugging)
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH); 
 
@@ -156,31 +170,52 @@ void setup() {
   pinMode(PIN_IN8, OUTPUT);
   controlMotors(0); // Stop motors initially
 
+  // Initialize MPU6050
+  imu.setup();
+  imu.setBias();
+
   delay(2000);
 
   allocator = rcl_get_default_allocator();
-
-  //create init_options
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
-
-  // create node
-  RCCHECK(rclc_node_init_default(&node, "micro_ros_platformio_node", "", &support));
+  RCCHECK(rclc_node_init_default(&node, "micro_ros_platformio_drivebase", "", &support));
 
   // create subscriber
   RCCHECK(rclc_subscription_init_default(
     &subscriber,
     &node,
     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-    "micro_ros_arduino_subscriber"));
+    "drivebase_subscriber"));
 
-  // create executor
+  // Create IMU publisher
+  RCCHECK(rclc_publisher_init_best_effort(
+    &imu_publisher,
+    &node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Imu),
+    "/imu"));
+
+  // Executor initialization
   RCCHECK(rclc_executor_init(&executor, &support.context, 1, &allocator));
-  // RCCHECK(rclc_executor_add_timer(&executor, &timer));
   RCCHECK(rclc_executor_add_subscription(&executor, &subscriber, &msg, &subscription_callback, ON_NEW_DATA));
-
 }
 
 void loop() {
-  delay(100);
-  RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
+  // Update gyro calibration
+  imu.updateBias();
+ 
+  // Fill the IMU message
+  imu_msg.angular_velocity.x = imu.gx();
+  imu_msg.angular_velocity.y = imu.gy();
+  imu_msg.angular_velocity.z = imu.gz();
+
+  imu_msg.linear_acceleration.x = imu.ax();
+  imu_msg.linear_acceleration.y = imu.ay();
+  imu_msg.linear_acceleration.z = imu.az();
+
+  // Publish IMU data
+  RCSOFTCHECK(rcl_publish(&imu_publisher, &imu_msg, NULL));
+
+  // Spin executor
+  RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10)));
+  delay(10);
 }
