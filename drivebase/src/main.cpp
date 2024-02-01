@@ -34,6 +34,13 @@ rcl_node_t node;
 #define PIN_ENA_LEFT_B 33
 #define PIN_ENA_RIGHT_B 12
 
+// Define Motor Directions
+#define FWD 1
+#define BCK 2
+#define LEFT 3
+#define RIGHT 4
+#define STOP 5
+
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
 
@@ -46,7 +53,7 @@ void error_loop() {
 }
 
 void controlMotors(int command, int speed = 255) {
-  if (command == 1) { // forward
+  if (command == FWD) { // forward
     digitalWrite(PIN_IN1, HIGH);
     digitalWrite(PIN_IN2, LOW);
     digitalWrite(PIN_IN3, LOW);
@@ -60,7 +67,7 @@ void controlMotors(int command, int speed = 255) {
     digitalWrite(PIN_IN8, HIGH);
     analogWrite(PIN_ENA_LEFT_B, speed);
     analogWrite(PIN_ENA_RIGHT_B, speed);
-  } else if (command == 2) { // backward
+  } else if (command == BCK) { // backward
     digitalWrite(PIN_IN1, LOW);
     digitalWrite(PIN_IN2, HIGH);
     digitalWrite(PIN_IN3, HIGH);
@@ -74,7 +81,7 @@ void controlMotors(int command, int speed = 255) {
     digitalWrite(PIN_IN8, LOW);
     analogWrite(PIN_ENA_LEFT_B, speed);
     analogWrite(PIN_ENA_RIGHT_B, speed);
-  } else if (command == 3) { // left
+  } else if (command == LEFT) { // left
     digitalWrite(PIN_IN1, LOW);
     digitalWrite(PIN_IN2, HIGH);
     digitalWrite(PIN_IN3, LOW);
@@ -88,7 +95,7 @@ void controlMotors(int command, int speed = 255) {
     digitalWrite(PIN_IN8, HIGH);
     analogWrite(PIN_ENA_LEFT_B, 0);
     analogWrite(PIN_ENA_RIGHT_B, speed);
-  } else if (command == 4) { // right
+  } else if (command == RIGHT) { // right
     digitalWrite(PIN_IN1, HIGH);
     digitalWrite(PIN_IN2, LOW);
     digitalWrite(PIN_IN3, HIGH);
