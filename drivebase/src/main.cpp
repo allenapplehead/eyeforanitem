@@ -1,3 +1,6 @@
+#include "I2Cdev.h"
+#include "MPU6050_6Axis_MotionApps20.h"
+
 #include <Arduino.h>
 #include <micro_ros_platformio.h>
 #include <rcl/rcl.h>
@@ -5,13 +8,18 @@
 #include <rclc/executor.h>
 #include <std_msgs/msg/int32.h>
 
-#include <micro_ros_arduino.h>
-#include <basicMPU6050.h>
 #include <sensor_msgs/msg/imu.h>
+//#include "MPU6050.h" // not necessary if using MotionApps include file
 
-#if !defined(MICRO_ROS_TRANSPORT_ARDUINO_SERIAL)
-#error This example is only avaliable for Arduino framework with serial transport.
+// Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
+// is used in I2Cdev.h
+#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    #include "Wire.h"
 #endif
+
+// #if !defined(MICRO_ROS_TRANSPORT_ARDUINO_SERIAL)
+// #error This example is only avaliable for Arduino framework with serial transport.
+// #endif
 
 rcl_subscription_t subscriber;
 std_msgs__msg__Int32 msg;
@@ -55,8 +63,30 @@ void error_loop() {
   }
 }
 
-// Create instance of MPU6050
-basicMPU6050<> imu;
+// IMU
+MPU6050 mpu;
+
+#define EARTH_GRAVITY_MS2 9.80665  // m/s2
+#define DEG_TO_RAD        0.017453292519943295769236907684886
+#define RAD_TO_DEG        57.295779513082320876798154814105
+
+// MPU control/status vars
+bool dmpReady = false;  // set true if DMP init was successful
+uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
+uint8_t devStatus;      // return status after each device operation (0 = success, !0 = error)
+uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
+uint16_t fifoCount;     // count of all bytes currently in FIFO
+uint8_t fifoBuffer[64]; // FIFO storage buffer
+
+// orientation/motion vars
+Quaternion q;           // [w, x, y, z]         quaternion container
+VectorInt16 aa;         // [x, y, z]            accel sensor measurements
+VectorInt16 gg;         // [x, y, z]            gyro sensor measurements
+VectorInt16 aaWorld;    // [x, y, z]            world-frame accel sensor measurements
+VectorInt16 ggWorld;    // [x, y, z]            world-frame accel sensor measurements
+VectorFloat gravity;    // [x, y, z]            gravity vector
+float euler[3];         // [psi, theta, phi]    Euler angle container
+float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
 // ROS publisher and message
 rcl_publisher_t imu_publisher;
@@ -152,6 +182,13 @@ void subscription_callback(const void * msgin)
 
 // Setup function for micro-ROS
 void setup() {
+  #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    Wire.begin();
+    Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
+  #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+    Fastwire::setup(400, true);
+  #endif
+
   // Configure serial transport
   Serial.begin(115200);
   set_microros_serial_transports(Serial);
@@ -171,10 +208,31 @@ void setup() {
   controlMotors(0); // Stop motors initially
 
   // Initialize MPU6050
-  imu.setup();
-  imu.setBias();
+  mpu.initialize();
+  devStatus = mpu.dmpInitialize();
 
-  delay(2000);
+  // supply your own gyro offsets here, scaled for min sensitivity
+  mpu.setXGyroOffset(-156);
+  mpu.setYGyroOffset(-11);
+  mpu.setZGyroOffset(-14);
+  mpu.setXAccelOffset(-3699);
+  mpu.setYAccelOffset(-2519);
+  mpu.setZAccelOffset(1391); // 1688 factory default for my test chip
+
+  // make sure it worked (returns 0 if so)
+  if (devStatus == 0) {
+
+      mpu.CalibrateAccel(6);
+      mpu.CalibrateGyro(6);
+      mpu.PrintActiveOffsets();
+      mpu.setDMPEnabled(true);
+
+      mpuIntStatus = mpu.getIntStatus();
+
+      dmpReady = true;
+      packetSize = mpu.dmpGetFIFOPacketSize();
+  }
+
 
   allocator = rcl_get_default_allocator();
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
@@ -200,20 +258,32 @@ void setup() {
 }
 
 void loop() {
-  // Update gyro calibration
-  imu.updateBias();
+  if (!dmpReady) return;
  
-  // Fill the IMU message
-  imu_msg.angular_velocity.x = imu.gx();
-  imu_msg.angular_velocity.y = imu.gy();
-  imu_msg.angular_velocity.z = imu.gz();
+  if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) {
+    // Fill orientation data
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    imu_msg.orientation.w = q.w;
+    imu_msg.orientation.x = q.x;
+    imu_msg.orientation.y = q.y;
+    imu_msg.orientation.z = q.z;
 
-  imu_msg.linear_acceleration.x = imu.ax();
-  imu_msg.linear_acceleration.y = imu.ay();
-  imu_msg.linear_acceleration.z = imu.az();
+    // Fill linear acceleration data
+    mpu.dmpGetAccel(&aa, fifoBuffer);
+    imu_msg.linear_acceleration.x = aa.x * mpu.get_acce_resolution() * EARTH_GRAVITY_MS2;
+    imu_msg.linear_acceleration.y = aa.y * mpu.get_acce_resolution() * EARTH_GRAVITY_MS2;
+    imu_msg.linear_acceleration.z = aa.z * mpu.get_acce_resolution() * EARTH_GRAVITY_MS2;
 
-  // Publish IMU data
-  RCSOFTCHECK(rcl_publish(&imu_publisher, &imu_msg, NULL));
+    // Fill angular velocity data
+    mpu.dmpGetGyro(&gg, fifoBuffer);
+    imu_msg.angular_velocity.x = gg.x * mpu.get_gyro_resolution() * DEG_TO_RAD;
+    imu_msg.angular_velocity.y = gg.y * mpu.get_gyro_resolution() * DEG_TO_RAD;
+    imu_msg.angular_velocity.z = gg.z * mpu.get_gyro_resolution() * DEG_TO_RAD;
+        
+    // Publish IMU data
+    RCSOFTCHECK(rcl_publish(&imu_publisher, &imu_msg, NULL));
+
+  }
 
   // Spin executor
   RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10)));
