@@ -4,4 +4,4 @@ image_collector_node:
     dataset_dir: /data/datasets/image_collector/train
     blurry_dir: /data/datasets/image_collector/blurry
     save_imgs: True
-    blur_thres: 100.0
+    blur_thres: 50.0

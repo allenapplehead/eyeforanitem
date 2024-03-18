@@ -25,3 +25,14 @@ NanoDB commands
     --path /my_dataset/nanodb \
     --server --port=7860
 ```
+
+Run data collection
+If you are visualizing through vscode ssh, start vcxsrv
+```cd eyeforanitem
+./run_ros.sh
+source /opt/ros/iron/install/setup.bash
+cd robot_ws
+source install/local_setup.bash
+ros2 launch image_collector image_collector_launch.py
+```
+Saves the images to `.../eyeforanitem/jetson-containers/data/datasets/image_collector/...`
