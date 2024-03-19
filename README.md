@@ -6,15 +6,11 @@ docker pull dustynv/ros:iron-desktop-l4t-r35.2.1
 cd docker
 docker build -t ${USER}/ros:iron-desktop-l4t-r35.2.1 .
 ```
-`./run_ros.sh`: enter ros2 container
 
-
-### ESP32 serial communication
-```./run_ros.sh
-source /opt/ros/iron/install/setup.bash
-cd microros_ws
-source install/setup.bash
-ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0
+### Run ESP32 serial communication, IMU, and Camera Drivers
+```
+./run_ros.sh  # enter docker container
+./run_drivers.sh
 ```
 
 ### NanoDB commands

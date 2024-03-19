@@ -57,10 +57,9 @@ if [ "$ARCH" = "aarch64" ]; then
         --device /dev/snd \
         --device /dev/bus/usb \
         $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE $ESP32_DEVICE \
-        -v $(pwd)/robot_ws:/robot_ws \
-        -v $(pwd)/microros_ws:/microros_ws \
-        -v $(pwd)/catkin_ws_ov:/catkin_ws_ov \
+        -v $(pwd):/workspace \
         -v /ssd/rosbags:/rosbags \
+        --workdir /workspace \
         ${USER}/ros:iron-desktop-l4t-r35.2.1 "$@"
 
 elif [ "$ARCH" = "x86_64" ]; then
@@ -72,9 +71,8 @@ elif [ "$ARCH" = "x86_64" ]; then
         --env NVIDIA_DRIVER_CAPABILITIES=all \
         --volume $ROOT/jetson-containers/data:/data \
         $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE $ESP32_DEVICE \
-        -v $(pwd)/robot_ws:/robot_ws \
-        -v $(pwd)/microros_ws:/microros_ws \
-        -v $(pwd)/catkin_ws_ov:/catkin_ws_ov \
+        -v $(pwd):/workspace \
         -v /ssd/rosbags:/rosbags \
+        --workdir /workspace \
         ${USER}/ros:iron-desktop-l4t-r35.2.1 "$@"
 fi
