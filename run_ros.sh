@@ -59,7 +59,9 @@ if [ "$ARCH" = "aarch64" ]; then
         $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE $ESP32_DEVICE \
         -v $(pwd)/robot_ws:/robot_ws \
         -v $(pwd)/microros_ws:/microros_ws \
-        dustynv/ros:iron-desktop-l4t-r35.2.1 "$@"
+        -v $(pwd)/catkin_ws_ov:/catkin_ws_ov \
+        -v /ssd/rosbags:/rosbags \
+        ${USER}/ros:iron-desktop-l4t-r35.2.1 "$@"
 
 elif [ "$ARCH" = "x86_64" ]; then
     set -x
@@ -72,5 +74,7 @@ elif [ "$ARCH" = "x86_64" ]; then
         $V4L2_DEVICES $DISPLAY_DEVICE $ARDUINO_DEVICE $ESP32_DEVICE \
         -v $(pwd)/robot_ws:/robot_ws \
         -v $(pwd)/microros_ws:/microros_ws \
-        dustynv/ros:iron-desktop-l4t-r35.2.1 "$@"
+        -v $(pwd)/catkin_ws_ov:/catkin_ws_ov \
+        -v /ssd/rosbags:/rosbags \
+        ${USER}/ros:iron-desktop-l4t-r35.2.1 "$@"
 fi

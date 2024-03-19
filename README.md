@@ -1,6 +1,13 @@
 # An Eye for an Item
 
+### Build ROS2 container
+```
+docker pull dustynv/ros:iron-desktop-l4t-r35.2.1
+cd docker
+docker build -t ${USER}/ros:iron-desktop-l4t-r35.2.1 .
+```
 `./run_ros.sh`: enter ros2 container
+
 
 ### ESP32 serial communication
 ```./run_ros.sh
