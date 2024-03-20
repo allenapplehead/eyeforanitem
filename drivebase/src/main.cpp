@@ -128,27 +128,27 @@ void controlMotors(int command, int speed = 255) {
     digitalWrite(PIN_IN3, LOW);
     digitalWrite(PIN_IN4, HIGH);
     analogWrite(PIN_ENA_LEFT_F, 0);
-    analogWrite(PIN_ENA_RIGHT_F, speed);
+    analogWrite(PIN_ENA_RIGHT_F, 255);
 
     digitalWrite(PIN_IN5, LOW);
     digitalWrite(PIN_IN6, HIGH);
     digitalWrite(PIN_IN7, LOW);
     digitalWrite(PIN_IN8, HIGH);
     analogWrite(PIN_ENA_LEFT_B, 0);
-    analogWrite(PIN_ENA_RIGHT_B, speed);
+    analogWrite(PIN_ENA_RIGHT_B, 255);
   } else if (command == RIGHT) { // right
     digitalWrite(PIN_IN1, HIGH);
     digitalWrite(PIN_IN2, LOW);
     digitalWrite(PIN_IN3, HIGH);
     digitalWrite(PIN_IN4, LOW);
-    analogWrite(PIN_ENA_LEFT_F, speed);
+    analogWrite(PIN_ENA_LEFT_F, 255);
     analogWrite(PIN_ENA_RIGHT_F, 0);
 
     digitalWrite(PIN_IN5, HIGH);
     digitalWrite(PIN_IN6, LOW);
     digitalWrite(PIN_IN7, HIGH);
     digitalWrite(PIN_IN8, LOW);
-    analogWrite(PIN_ENA_LEFT_B, speed);
+    analogWrite(PIN_ENA_LEFT_B, 255);
     analogWrite(PIN_ENA_RIGHT_B, 0);
   } else { // "stop" or any other command
     digitalWrite(PIN_IN1, LOW);
@@ -176,7 +176,7 @@ void subscription_callback(const void * msgin)
   // 3 - Left
   // 4 - Right
   // 5 - Stop
-  controlMotors(msg->data);
+  controlMotors(msg->data, 200);
 }
 
 
