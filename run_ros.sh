@@ -60,7 +60,7 @@ if [ "$ARCH" = "aarch64" ]; then
         -v $(pwd):/workspace \
         -v /ssd/rosbags:/rosbags \
         --workdir /workspace \
-        ${USER}/ros:iron-desktop-l4t-r35.2.1 "$@"
+        ${USER}/ros:humble-desktop-l4t-r35.2.1 "$@"
 
 elif [ "$ARCH" = "x86_64" ]; then
     set -x
@@ -74,5 +74,5 @@ elif [ "$ARCH" = "x86_64" ]; then
         -v $(pwd):/workspace \
         -v /ssd/rosbags:/rosbags \
         --workdir /workspace \
-        ${USER}/ros:iron-desktop-l4t-r35.2.1 "$@"
+        ${USER}/ros:humble-desktop-l4t-r35.2.1 "$@"
 fi

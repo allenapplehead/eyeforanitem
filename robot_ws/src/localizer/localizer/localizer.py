@@ -114,7 +114,9 @@ class IMUToOdometry(Node):
         odom_msg.header.stamp = self.get_clock().now().to_msg()
         odom_msg.header.frame_id = 'world'
         odom_msg.child_frame_id = 'base_link'
-        odom_msg.pose.pose.position = self.position
+        odom_msg.pose.pose.position.x = self.position.x
+        odom_msg.pose.pose.position.y = self.position.y
+        odom_msg.pose.pose.position.z = self.position.z
         odom_msg.pose.pose.orientation = msg.orientation
         self.publisher.publish(odom_msg)
 
