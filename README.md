@@ -40,6 +40,14 @@ ros2 launch image_collector image_collector_launch.py
 ```
 Saves the images to `.../eyeforanitem/jetson-containers/data/datasets/image_collector/...`
 
+### Run 2D localization
+```
+./run_ros.sh
+In one terminal, ./run_drivers.sh
+In another terminal, rviz2. Select the loc.rviz config file in .../robot_ws/src/localizer/config/
+In a third terminal: cd robot_ws, source install/setup.bash, ros2 run localizer localizer
+```
+
 ### Teleoperation
 If you wish to drive the robot manually:
 * Upload `arduino_code/drivebase/drivebase.ino` onto the ESP32
