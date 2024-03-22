@@ -52,7 +52,7 @@ In a third terminal: cd robot_ws, source install/setup.bash, ros2 run localizer 
 ```
 set ISAAC_ROS_WS environment variable
 cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-  ./scripts/run_dev.sh
+  ./scripts/run_dev.sh /ssd/eyeforanitem/isaac_ros-dev
 sudo apt-get install -y ros-humble-isaac-ros-apriltag
 ros2 launch isaac_ros_apriltag isaac_ros_apriltag.launch.py
 ```
