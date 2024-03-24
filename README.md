@@ -68,7 +68,19 @@ rviz2 -d /workspaces/isaac_ros-dev/src/isaac_ros_apriltag/isaac_ros_apriltag/rvi
 ```
 
 ### Teleoperation
-If you wish to drive the robot manually:
+```
+# in one terminal
+./run_ros.sh
+./run_drivers.sh
+
+# in a second terminal
+./run_ros.sh
+cd robot_ws
+source install/setup.bash
+ros2 run localizer teleop_keyboard
+```
+
+If you instead just wish to drive the robot manually using pure arduino code without any Jetson software:
 * Upload `arduino_code/drivebase/drivebase.ino` onto the ESP32
 * Download an arduino car app on your phone. I'm using "Arduino Car"
 * On your phone, connect to ESP32_BT_Car

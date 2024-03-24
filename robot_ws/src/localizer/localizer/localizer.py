@@ -102,6 +102,9 @@ class IMUToOdometry(Node):
         # calculate x and y position
         _, _, self.yaw = self.quaternion_to_euler(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w)
 
+        # imu has z axis pointing downwards
+        self.yaw *= -1
+
         self.x_k = self.x_k + (self.a * (self.nu_l + self.nu_r) * np.cos(self.yaw) * dt) / 2.0
         self.y_k = self.y_k + (self.a * (self.nu_l + self.nu_r) * np.sin(self.yaw) * dt) / 2.0
 

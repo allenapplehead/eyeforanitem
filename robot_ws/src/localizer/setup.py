@@ -20,7 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'localizer = localizer.localizer:main'
+            'localizer = localizer.localizer:main',
+            'tag_odom = localizer.tag_odom:main',
+            'teleop_keyboard = localizer.teleop_keyboard:main'
         ],
     },
 )
