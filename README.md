@@ -51,10 +51,20 @@ In a third terminal: cd robot_ws, source install/setup.bash, ros2 run localizer 
 ### Isaac ROS Apriltags
 ```
 set ISAAC_ROS_WS environment variable
+
+# in one terminal
 cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
   ./scripts/run_dev.sh /ssd/eyeforanitem/isaac_ros-dev
 sudo apt-get install -y ros-humble-isaac-ros-apriltag
-ros2 launch isaac_ros_apriltag isaac_ros_apriltag.launch.py
+cd /workspaces/isaac_ros-dev && \
+  colcon build --symlink-install && \
+  source install/setup.bash
+ros2 launch isaac_ros_apriltag isaac_ros_apriltag_usb_cam.launch.py
+
+# in a second terminal
+cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+  ./scripts/run_dev.sh /ssd/eyeforanitem/isaac_ros-dev
+rviz2 -d /workspaces/isaac_ros-dev/src/isaac_ros_apriltag/isaac_ros_apriltag/rviz/usb_cam.rviz
 ```
 
 ### Teleoperation
