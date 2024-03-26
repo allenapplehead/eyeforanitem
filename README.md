@@ -7,7 +7,7 @@ cd docker
 docker build -t ${USER}/ros:humble-desktop-l4t-r35.2.1 .
 ```
 
-### Run ESP32 serial communication, IMU, and Camera Drivers
+### Run ESP32 serial communication, IMU, and teleop drivers
 ```
 ./run_ros.sh  # enter docker container
 ./run_drivers.sh
@@ -65,6 +65,11 @@ ros2 launch isaac_ros_apriltag isaac_ros_apriltag_usb_cam.launch.py
 cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
   ./scripts/run_dev.sh /ssd/eyeforanitem/isaac_ros-dev
 rviz2 -d /workspaces/isaac_ros-dev/src/isaac_ros_apriltag/isaac_ros_apriltag/rviz/usb_cam.rviz
+```
+
+### Record a rosbag (for offline processing)
+```
+ros2 bag record -o tag_test /camera_info /camera_info/nitros /camera_info_rect /camera_info_rect/nitros /drivebase_subscriber /image_raw /image_raw/compressed /image_raw/compressedDepth /image_raw/nitros /image_raw/theora /image_rect /image_rect/nitros /image_rect/nitros/nitros_image_rgb8 /imu /tag_detections /tag_detections/nitros
 ```
 
 ### Teleoperation

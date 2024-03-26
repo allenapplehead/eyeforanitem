@@ -11,7 +11,7 @@ tmux select-pane -t 0
 # Send the commands to the first pane
 tmux send-keys 'cd robot_ws' C-m
 tmux send-keys 'source install/setup.bash' C-m
-tmux send-keys 'ros2 run webcam_driver driver' C-m
+# tmux send-keys 'ros2 run webcam_driver driver' C-m
 
 # Select the second pane (Pane 1)
 tmux select-pane -t 1
