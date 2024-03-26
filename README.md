@@ -69,6 +69,9 @@ rviz2 -d /workspaces/isaac_ros-dev/src/isaac_ros_apriltag/isaac_ros_apriltag/rvi
 
 ### Record a rosbag (for offline processing)
 ```
+./run_ros.sh
+source robot_ws/install/setup.bash
+cd /rosbags  # or where-ever you put your rosbags
 ros2 bag record -o tag_test /camera_info /camera_info/nitros /camera_info_rect /camera_info_rect/nitros /drivebase_subscriber /image_raw /image_raw/compressed /image_raw/compressedDepth /image_raw/nitros /image_raw/theora /image_rect /image_rect/nitros /image_rect/nitros/nitros_image_rgb8 /imu /tag_detections /tag_detections/nitros
 ```
 
