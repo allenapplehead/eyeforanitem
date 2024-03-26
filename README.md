@@ -75,6 +75,18 @@ cd /rosbags  # or where-ever you put your rosbags
 ros2 bag record -o tag_test /camera_info /camera_info/nitros /camera_info_rect /camera_info_rect/nitros /drivebase_subscriber /image_raw /image_raw/compressed /image_raw/compressedDepth /image_raw/nitros /image_raw/theora /image_rect /image_rect/nitros /image_rect/nitros/nitros_image_rgb8 /imu /tag_detections /tag_detections/nitros
 ```
 
+### Run 2D Odometry
+```
+./run_ros.sh
+source robot_ws/install/setup.bash
+ros2 launch localizer localizer_launch.py
+
+# if you wish to preview this, in a second terminal:
+./run_ros.sh
+rviz2
+open loc.rviz in localizer package
+```
+
 ### Teleoperation
 ```
 # in one terminal
