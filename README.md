@@ -136,3 +136,8 @@ If you instead just wish to drive the robot manually using pure arduino code wit
 * On your phone, connect to ESP32_BT_Car
 * Set the controls to match the character commands in the uploaded arduino script
 
+## 4. Architecture Diagrams
+To better make sense of the structure of this repository, please refer to the diagrams below:
+
+### ROS2 Architecture
+![ros2_arch](https://github.com/allenapplehead/eyeforanitem/assets/44914805/624e5eab-baba-4859-8425-9148fc8fa03a)
