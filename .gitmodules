@@ -1,6 +1,3 @@
 [submodule "jetson-containers"]
 	path = jetson-containers
 	url = https://github.com/allenapplehead/jetson-containers
-[submodule "catkin_ws_ov/src/open_vins"]
-	path = catkin_ws_ov/src/open_vins
-	url = https://github.com/allenapplehead/open_vins
