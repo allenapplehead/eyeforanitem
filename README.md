@@ -104,6 +104,7 @@ Saves the images to `.../eyeforanitem/jetson-containers/data/datasets/image_coll
 ## 2.2 Post-processing and finding your item through NanoDB
 
 ### 2.2.1 NanoDB commands
+If you've just collected your dataset, you need to build your embeddings first. This only needs to be once per data collection
 ```cd jetson-containers
 ./run.sh -v ${PWD}/data/datasets/image_collector/train:/my_dataset $(./autotag nanodb) \
   python3 -m nanodb \
@@ -112,11 +113,19 @@ Saves the images to `.../eyeforanitem/jetson-containers/data/datasets/image_coll
     --autosave --validate
 ```
 
-```cd jetson-containers
-./run.sh -v ${PWD}/data/datasets/image_collector/train:/my_dataset $(./autotag nanodb) \
+To spin up the gradio webserver (allows text or image queries) and the command line query environment to enter your missing object, run this:
+```
+cd /ssd/eyeforanitem/jetson-containers && ./run.sh -v ${PWD}/data/datasets/image_collector/train:/my_dataset $(./autotag nanodb) \
   python3 -m nanodb \
     --path /my_dataset/nanodb \
-    --server --port=7860
+    --server --port=7860 --k 8 | tee /ssd/eyeforanitem/scripts/out.txt
+```
+
+To process your most recent command line query (saved into `out.txt` by previous command), and get location stamps for where the image was taken, run this:
+```
+./run_ros.sh
+cd scripts
+python3 find_obj.py
 ```
 
 ## 3. Bonus / Helpful features

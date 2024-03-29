@@ -8,6 +8,31 @@ import os
 import datetime
 import time
 import pickle
+import math
+import shutil
+
+
+def quaternion_to_euler(x, y, z, w):
+    """
+    Convert a quaternion into euler angles (roll, pitch, yaw)
+    roll is rotation around x in radians (counterclockwise)
+    pitch is rotation around y in radians (counterclockwise)
+    yaw is rotation around z in radians (counterclockwise)
+    """
+    t0 = +2.0 * (w * x + y * z)
+    t1 = +1.0 - 2.0 * (x * x + y * y)
+    roll_x = math.atan2(t0, t1)
+
+    t2 = +2.0 * (w * y - z * x)
+    t2 = +1.0 if t2 > +1.0 else t2
+    t2 = -1.0 if t2 < -1.0 else t2
+    pitch_y = math.asin(t2)
+
+    t3 = +2.0 * (w * z + x * y)
+    t4 = +1.0 - 2.0 * (y * y + z * z)
+    yaw_z = math.atan2(t3, t4)
+
+    return roll_x, pitch_y, yaw_z
 
 
 class ImageCollector(Node):
@@ -68,6 +93,16 @@ class ImageCollector(Node):
             "odom_topic").get_parameter_value().string_value)
         print("+--------------------------+")
 
+        # Wipe previous images if requested
+        if self.wipe_prev_:
+            if os.path.exists(self.dataset_dir_):
+                shutil.rmtree(self.dataset_dir_)
+            if os.path.exists(self.blurry_dir_):
+                shutil.rmtree(self.blurry_dir_)
+            if os.path.exists(self.stamps_dir_):
+                shutil.rmtree(self.stamps_dir_)
+            self.get_logger().info("Wiped previous data")
+
         # Create dataset directory if it doesn't exist
         if not os.path.exists(self.dataset_dir_):
             os.makedirs(self.dataset_dir_, exist_ok=True)
@@ -76,15 +111,6 @@ class ImageCollector(Node):
         if not os.path.exists(self.stamps_dir_):
             os.makedirs(self.stamps_dir_, exist_ok=True)
 
-        # Wipe previous images if requested
-        if self.wipe_prev_:
-            for file in os.listdir(self.dataset_dir_):
-                os.remove(os.path.join(self.dataset_dir_, file))
-            for file in os.listdir(self.blurry_dir_):
-                os.remove(os.path.join(self.blurry_dir_, file))
-            for file in os.listdir(self.stamps_dir_):
-                os.remove(os.path.join(self.stamps_dir_, file))
-            self.get_logger().info("Wiped previous data")
 
         self.cv_bridge = CvBridge()
 
@@ -134,9 +160,13 @@ class ImageCollector(Node):
         cv2.waitKey(1)
 
     def odom_callback(self, msg):
+        # convert quat to euler
+        x, y, z, w = msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w
+        roll, pitch, yaw = quaternion_to_euler(x, y, z, w)
+
         # Save the most recent 2D odometry of the robot
         self.last_odom_ = (msg.pose.pose.position.x,
-                           msg.pose.pose.position.y, msg.pose.pose.orientation.z)
+                           msg.pose.pose.position.y, yaw)
 
     def __del__(self):
         cv2.destroyAllWindows()

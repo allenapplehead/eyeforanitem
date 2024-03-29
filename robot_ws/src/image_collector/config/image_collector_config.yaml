@@ -5,7 +5,7 @@ image_collector_node:
     blurry_dir: /data/datasets/image_collector/blurry
     stamps_dir: /data/datasets/image_collector/stamps
     save_imgs: True
-    blur_thres: 40.0  # lower makes filter less strict (i.e. tolerate more blur in train)
+    blur_thres: 50.0  # lower makes filter less strict (i.e. tolerate more blur in train)
     wipe_prev: True
     image_topic: /image_raw
     odom_topic: /odom

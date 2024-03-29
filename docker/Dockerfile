@@ -19,5 +19,8 @@ RUN mkdir -p /etc/ros/rosdep/sources.list.d/ \
     && echo "yaml file:///etc/ros/rosdep/sources.list.d/nvidia-isaac.yaml" | tee /etc/ros/rosdep/sources.list.d/00-nvidia-isaac.list \
     && rosdep update
 
+# tkinter deps
+RUN apt-get install python3-pil python3-pil.imagetk -y
+
 # Source ROS install
 RUN echo "source /opt/ros/humble/install/setup.bash" >> /root/.bashrc
