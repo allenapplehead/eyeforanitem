@@ -2,32 +2,54 @@ import rclpy
 from rclpy.node import Node
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
+from nav_msgs.msg import Odometry
 import cv2
 import os
 import datetime
 import time
+import pickle
+
 
 class ImageCollector(Node):
     def __init__(self):
         super().__init__('image_collector_node')
-        
+
         # Declare parameters
         self.declare_parameter("capture_period", 1.0)
-        self.declare_parameter("dataset_dir", "/data/datasets/image_collector/train")
-        self.declare_parameter("blurry_dir", "/data/datasets/image_collector/blurry")
+        self.declare_parameter(
+            "dataset_dir", "/data/datasets/image_collector/train")
+        self.declare_parameter(
+            "blurry_dir", "/data/datasets/image_collector/blurry")
         self.declare_parameter("save_imgs", True)
         self.declare_parameter("blur_thres", 100.0)
         self.declare_parameter("wipe_prev", False)
+        self.declare_parameter("image_topic", "/image_raw")
+        self.declare_parameter("odom_topic", "/odom")
 
         # Get parameters
-        self.capture_period_ = self.get_parameter("capture_period").get_parameter_value().double_value
-        self.dataset_dir_ = self.get_parameter("dataset_dir").get_parameter_value().string_value
-        self.blurry_dir_ = self.get_parameter("blurry_dir").get_parameter_value().string_value
-        self.save_imgs_ = self.get_parameter("save_imgs").get_parameter_value().bool_value
-        self.blur_thres_ = self.get_parameter("blur_thres").get_parameter_value().double_value
-        self.wipe_prev_ = self.get_parameter("wipe_prev").get_parameter_value().bool_value
+        self.capture_period_ = self.get_parameter(
+            "capture_period").get_parameter_value().double_value
+        self.dataset_dir_ = self.get_parameter(
+            "dataset_dir").get_parameter_value().string_value
+        self.blurry_dir_ = self.get_parameter(
+            "blurry_dir").get_parameter_value().string_value
+        self.save_imgs_ = self.get_parameter(
+            "save_imgs").get_parameter_value().bool_value
+        self.blur_thres_ = self.get_parameter(
+            "blur_thres").get_parameter_value().double_value
+        self.wipe_prev_ = self.get_parameter(
+            "wipe_prev").get_parameter_value().bool_value
 
+        # location and timestamp dictionary, to be pickled
+        # (image name ->  (robot x, robot y, robot yaw))
+        # note that the image name is already the timestamp
+        self.stamp_dict = {}
+
+        # last save time
         self.last_save_time_ = time.time()
+
+        # most recent odometry
+        self.last_odom_ = (0.0, 0.0, 0.0)  # zero initial state assumption
 
         print("+--------------------------+")
         print("Setting capture period to:", self.capture_period_)
@@ -42,7 +64,8 @@ class ImageCollector(Node):
         if not os.path.exists(self.dataset_dir_):
             os.makedirs(self.dataset_dir_, exist_ok=True)
             os.makedirs(self.blurry_dir_, exist_ok=True)
-            self.get_logger().info(f"Created dataset directory: {self.dataset_dir_}")
+            self.get_logger().info(
+                f"Created dataset directory: {self.dataset_dir_}")
 
         # Wipe previous images if requested
         if self.wipe_prev_:
@@ -54,11 +77,20 @@ class ImageCollector(Node):
 
         self.cv_bridge = CvBridge()
 
-        # Subscribe to the /camera/image_raw topic
+        # Subscribe to the image topic
         self.subscription = self.create_subscription(
             Image,
-            '/camera/image_raw',
+            self.get_parameter(
+                "image_topic").get_parameter_value().string_value,
             self.image_callback,
+            10)
+
+        # Subscribe to robot odometry
+        self.subscription = self.create_subscription(
+            Odometry,
+            self.get_parameter(
+                "odom_topic").get_parameter_value().string_value,
+            self.odom_callback,
             10)
 
     def blurry_check(self, image):
@@ -77,6 +109,11 @@ class ImageCollector(Node):
                 filepath = os.path.join(self.blurry_dir_, filename)
             else:
                 filepath = os.path.join(self.dataset_dir_, filename)
+                self.stamp_dict[filename] = self.last_odom_
+                # write pickle to disc in dataset dir
+                with open(os.path.join(self.dataset_dir_, "stamps.pkl"), 'wb') as f:
+                    pickle.dump(self.stamp_dict, f)
+
             cv2.imwrite(filepath, cv_image)
             self.last_save_time_ = time.time()
             self.get_logger().info(f"Saved image {filename}")
@@ -85,14 +122,21 @@ class ImageCollector(Node):
         cv2.imshow('Current Frame', cv_image)
         cv2.waitKey(1)
 
+    def odom_callback(self, msg):
+        # Save the most recent 2D odometry of the robot
+        self.last_odom_ = (msg.pose.pose.position.x,
+                           msg.pose.pose.position.y, msg.pose.pose.orientation.z)
+
     def __del__(self):
         cv2.destroyAllWindows()
+
 
 def main(args=None):
     rclpy.init(args=args)
     image_collector = ImageCollector()
     rclpy.spin(image_collector)
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

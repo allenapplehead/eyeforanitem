@@ -6,3 +6,5 @@ image_collector_node:
     save_imgs: True
     blur_thres: 35.0  # lower makes filter less strict (i.e. tolerate more blur in train)
     wipe_prev: True
+    image_topic: /image_raw
+    odom_topic: /odom
