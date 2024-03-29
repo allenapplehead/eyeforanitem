@@ -20,6 +20,8 @@ class ImageCollector(Node):
             "dataset_dir", "/data/datasets/image_collector/train")
         self.declare_parameter(
             "blurry_dir", "/data/datasets/image_collector/blurry")
+        self.declare_parameter(
+            "stamps_dir", "/data/datasets/image_collector/stamps")
         self.declare_parameter("save_imgs", True)
         self.declare_parameter("blur_thres", 100.0)
         self.declare_parameter("wipe_prev", False)
@@ -33,6 +35,8 @@ class ImageCollector(Node):
             "dataset_dir").get_parameter_value().string_value
         self.blurry_dir_ = self.get_parameter(
             "blurry_dir").get_parameter_value().string_value
+        self.stamps_dir_ = self.get_parameter(
+            "stamps_dir").get_parameter_value().string_value
         self.save_imgs_ = self.get_parameter(
             "save_imgs").get_parameter_value().bool_value
         self.blur_thres_ = self.get_parameter(
@@ -58,14 +62,19 @@ class ImageCollector(Node):
         print("Save images:", self.save_imgs_)
         print("Acceptable blur threshold:", self.blur_thres_)
         print("Wipe previous images:", self.wipe_prev_)
+        print("Subscribing to image topic:", self.get_parameter(
+            "image_topic").get_parameter_value().string_value)
+        print("Subscribing to odometry topic:", self.get_parameter(
+            "odom_topic").get_parameter_value().string_value)
         print("+--------------------------+")
 
         # Create dataset directory if it doesn't exist
         if not os.path.exists(self.dataset_dir_):
             os.makedirs(self.dataset_dir_, exist_ok=True)
+        if not os.path.exists(self.blurry_dir_):
             os.makedirs(self.blurry_dir_, exist_ok=True)
-            self.get_logger().info(
-                f"Created dataset directory: {self.dataset_dir_}")
+        if not os.path.exists(self.stamps_dir_):
+            os.makedirs(self.stamps_dir_, exist_ok=True)
 
         # Wipe previous images if requested
         if self.wipe_prev_:
@@ -73,7 +82,9 @@ class ImageCollector(Node):
                 os.remove(os.path.join(self.dataset_dir_, file))
             for file in os.listdir(self.blurry_dir_):
                 os.remove(os.path.join(self.blurry_dir_, file))
-            self.get_logger().info("Wiped previous images")
+            for file in os.listdir(self.stamps_dir_):
+                os.remove(os.path.join(self.stamps_dir_, file))
+            self.get_logger().info("Wiped previous data")
 
         self.cv_bridge = CvBridge()
 
@@ -111,7 +122,7 @@ class ImageCollector(Node):
                 filepath = os.path.join(self.dataset_dir_, filename)
                 self.stamp_dict[filename] = self.last_odom_
                 # write pickle to disc in dataset dir
-                with open(os.path.join(self.dataset_dir_, "stamps.pkl"), 'wb') as f:
+                with open(os.path.join(self.stamps_dir_, "stamps.pkl"), 'wb') as f:
                     pickle.dump(self.stamp_dict, f)
 
             cv2.imwrite(filepath, cv_image)
