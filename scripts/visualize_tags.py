@@ -85,10 +85,10 @@ def visualize_tags(tags, image_name, robot_pose=None):
     ax.invert_xaxis()
     ax.set_aspect('equal', adjustable='box')
     
-    plt.title('Living Room Tag Configurations')
     plt.xlabel('Y position [m]')
     plt.ylabel('X position [m]')
     plt.grid(True)
+    plt.legend(['Robot'])
     plt.show()
 
 if __name__ == '__main__':
