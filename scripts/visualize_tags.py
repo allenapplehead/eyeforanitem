@@ -88,12 +88,19 @@ def visualize_tags(tags, image_name, robot_pose=None):
     plt.xlabel('Y position [m]')
     plt.ylabel('X position [m]')
     plt.grid(True)
-    plt.legend(['Robot'])
+    if robot_pose:
+        plt.legend(['Robot', 'Tags'])
+    else:
+        plt.legend(['Tags'])
     plt.show()
 
 if __name__ == '__main__':
+    config_path = '/workspace/robot_ws/src/localizer/config/tags.yaml'
+    tags = read_tag_configurations(config_path)
+
     if len(sys.argv) != 2:
-        print("Usage: python script.py <image_name>")
+        print("Image not given, visualizing tags only")
+        visualize_tags(tags, None)
         sys.exit(1)
         
     image_name = sys.argv[1]  # Command-line argument for the image name
@@ -105,6 +112,4 @@ if __name__ == '__main__':
     
     robot_pose = stamps.get(image_name)  # Get the robot pose for the given image name
     
-    config_path = '/workspace/robot_ws/src/localizer/config/tags.yaml'
-    tags = read_tag_configurations(config_path)
     visualize_tags(tags, image_name, robot_pose)
