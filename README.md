@@ -35,6 +35,4 @@ ROS2 workspace for this project. See system architecture diagram for details.
 
 `visualize_tags.py` is a helper script that draws the map of the robot environment, apriltag locations, and of course the robot location where the image was taken. This script is called by `find_obj.py` and you don't need to run this script directly.
 
-The below sections show how to set up this codebase, and how to run it on your robot to find your stuff.
-
 
