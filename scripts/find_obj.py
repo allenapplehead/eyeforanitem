@@ -6,6 +6,13 @@ import subprocess
 
 
 def on_image_click(image_name):
+    """
+    Handler for when an image is clicked. Executes a separate Python script,
+    passing the image name as an argument.
+
+    Parameters:
+    - image_name (str): The name of the clicked image.
+    """
     # Build the command to execute the script with the image name as an argument
     print("investigating:", image_name)
     command = f'python3 visualize_tags.py "{image_name}"'
@@ -13,6 +20,13 @@ def on_image_click(image_name):
 
 
 def display_images(image_paths, query):
+    """
+    Displays images in a Tkinter window with scroll functionality.
+
+    Parameters:
+    - image_paths (list): A list of paths to the images to be displayed.
+    - query (str): The search query to display as the window title.
+    """
     root = tk.Tk()
     root.title("Image Results for query: {}".format(query))
 
@@ -46,12 +60,23 @@ def display_images(image_paths, query):
 
     # Adjust row calculation to account for labels
     def calculate_position(index):
+        """
+        Calculates the grid position for an image based on its index.
+
+        Parameters:
+        - index (int): The index of the image in the list.
+
+        Returns:
+        - Tuple (row, col): The row and column in the grid where the image should be placed.
+        """
         return (index // images_per_row) * 2, index % images_per_row
 
     def on_enter(event):
+        """Change cursor to hand on hover over image."""
         root.config(cursor="hand2")
 
     def on_leave(event):
+        """Revert cursor to default when not hovering over image."""
         root.config(cursor="")
 
     # Display images in the frame
@@ -84,6 +109,12 @@ def display_images(image_paths, query):
 
 
 def parse_log_file(log_file_path):
+    """
+    Parses a log file to extract image paths and display them.
+
+    Parameters:
+    - log_file_path (str): Path to the log file.
+    """
     image_paths = []
     try:
         with open(log_file_path, 'r') as file:

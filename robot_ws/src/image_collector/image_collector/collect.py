@@ -18,6 +18,12 @@ def quaternion_to_euler(x, y, z, w):
     roll is rotation around x in radians (counterclockwise)
     pitch is rotation around y in radians (counterclockwise)
     yaw is rotation around z in radians (counterclockwise)
+
+    Parameters:
+    - x, y, z, w: Components of the quaternion.
+
+    Returns:
+    - Tuple of Euler angles (roll_x, pitch_y, yaw_z) in radians.
     """
     t0 = +2.0 * (w * x + y * z)
     t1 = +1.0 - 2.0 * (x * x + y * y)
@@ -36,6 +42,10 @@ def quaternion_to_euler(x, y, z, w):
 
 
 class ImageCollector(Node):
+    """
+    A ROS node that subscribes to an image topic and saves images to a dataset directory.
+    Images are filtered based on a blur threshold, and tagged with odometry information.
+    """
     def __init__(self):
         super().__init__('image_collector_node')
 
@@ -131,10 +141,28 @@ class ImageCollector(Node):
             10)
 
     def blurry_check(self, image):
+        """
+        Check if an image is blurry by computing the Laplacian variance.
+
+        Parameters:
+        - image: The input image to check for blur.
+
+        Returns:
+        - True if the image is blurry, False otherwise.
+        """
         laplacian_var = cv2.Laplacian(image, cv2.CV_64F).var()
         return laplacian_var < self.blur_thres_
 
     def image_callback(self, msg):
+        """
+        Callback function that processes image messages.
+
+        Parameters:
+        - msg: The image message received from the camera.
+
+        Returns:
+        - None
+        """
         # Convert ROS Image message to OpenCV image
         cv_image = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
@@ -160,6 +188,15 @@ class ImageCollector(Node):
         cv2.waitKey(1)
 
     def odom_callback(self, msg):
+        """
+        Callback function that processes odometry messages.
+
+        Parameters:
+        - msg: The odometry message received from the robot.
+
+        Returns:
+        - None
+        """
         # convert quat to euler
         x, y, z, w = msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w
         roll, pitch, yaw = quaternion_to_euler(x, y, z, w)

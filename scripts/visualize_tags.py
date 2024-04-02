@@ -6,6 +6,15 @@ import pickle
 import sys
 
 def read_tag_configurations(config_path):
+    """
+    Reads tag configurations from a YAML file.
+
+    Parameters:
+    - config_path (str): Path to the configuration YAML file.
+
+    Returns:
+    - dict: A dictionary with tag IDs as keys and their properties (position, rotation) as values.
+    """
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
     
@@ -22,14 +31,25 @@ def read_tag_configurations(config_path):
     return tags
 
 def add_tag(ax, center, yaw, tag_id):
-    width, height = 0.01, 0.2  # Thickness and length of the line representing the tag
+    """
+    Adds a graphical representation of a tag to the plot.
+
+    Parameters:
+    - ax: The matplotlib axis to draw on.
+    - center (tuple): The (x, y) center position of the tag.
+    - yaw (float): The yaw angle (rotation about the Z-axis) in degrees.
+    - tag_id (str): The identifier of the tag.
+    """
+    width, height = 0.01, 0.2  # Tag dimensions
     angle = np.deg2rad(yaw)
     
+    # Calculate the corners of the tag based on its center, size, and rotation
     corners = np.array([[-height / 2, -width / 2], [height / 2, -width / 2], [height / 2, width / 2], [-height / 2, width / 2]])
     rotation_matrix = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
     rotated_corners = np.dot(corners, rotation_matrix)
     translated_corners = rotated_corners + np.array([center[1], center[0]])
     
+    # Plot the tag as a polygon with an arrow indicating the forward direction
     polygon = patches.Polygon(translated_corners, closed=True, edgecolor='black', facecolor='none')
     ax.add_patch(polygon)
     arrow_length = 0.1
@@ -39,6 +59,14 @@ def add_tag(ax, center, yaw, tag_id):
     ax.text(center[1], center[0], f'ID: {tag_id}', fontsize=9, color='black', ha='center')
 
 def add_robot_pose(ax, image_name, pose):
+    """
+    Adds a graphical representation of the robot's pose to the plot.
+
+    Parameters:
+    - ax: The matplotlib axis to draw on.
+    - image_name (str): The name of the image associated with the robot's pose.
+    - pose (tuple): The (x, y, yaw) pose of the robot.
+    """
     print("robot pose:", pose)
     x, y, yaw = pose
     angle = yaw
@@ -64,6 +92,14 @@ def add_robot_pose(ax, image_name, pose):
     ax.text(y + label_dx, x + label_dy, image_name, fontsize=6, color='darkblue', ha='center', va='center')
 
 def visualize_tags(tags, image_name, robot_pose=None):
+    """
+    Visualizes the tags and optionally the robot's pose on a 2D plot.
+
+    Parameters:
+    - tags (dict): Dictionary of tags with their positions and orientations.
+    - image_name (str): The name of the image (used for labeling the robot pose).
+    - robot_pose (tuple, optional): The (x, y, yaw) pose of the robot.
+    """
     plt.figure(figsize=(10, 6))
     ax = plt.gca()
     

@@ -1,11 +1,11 @@
 image_collector_node:
   ros__parameters:
-    capture_period: 1.0
-    dataset_dir: /data/datasets/image_collector/train
-    blurry_dir: /data/datasets/image_collector/blurry
-    stamps_dir: /data/datasets/image_collector/stamps
-    save_imgs: True
-    blur_thres: 50.0  # lower makes filter less strict (i.e. tolerate more blur in train)
-    wipe_prev: True
+    capture_period: 1.0                                   # capture images every capture_period seconds
+    dataset_dir: /data/datasets/image_collector/train     # save images to this directory
+    blurry_dir: /data/datasets/image_collector/blurry     # save blurry images to this directory
+    stamps_dir: /data/datasets/image_collector/stamps     # save timestamps to this directory
+    save_imgs: True                                       # save images to disk
+    blur_thres: 50.0                                      # lower makes filter less strict (i.e. tolerate more blur in train)
+    wipe_prev: True                                       # wipe previous dataset
     image_topic: /image_raw
     odom_topic: /odom

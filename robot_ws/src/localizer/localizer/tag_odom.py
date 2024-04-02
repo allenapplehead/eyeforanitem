@@ -10,6 +10,18 @@ from ament_index_python.packages import get_package_share_directory
 
 
 def rpy_from_quaternion(x, y, z, w):
+    """
+    Converts a quaternion orientation to roll, pitch, and yaw angles.
+
+    Parameters:
+    - x (float): x component of the quaternion.
+    - y (float): y component of the quaternion.
+    - z (float): z component of the quaternion.
+    - w (float): w component of the quaternion.
+
+    Returns:
+    - list: A list containing the roll, pitch, and yaw angles in radians.
+    """
     roll = np.arctan2(2.0 * (z * y + w * x), 1.0 - 2.0 * (x * x + y * y))
     pitch = np.arcsin(2.0 * (y * w - z * x))
     yaw = np.arctan2(2.0 * (z * w + x * y), - 1.0 + 2.0 * (w * w + x * x))
@@ -18,6 +30,17 @@ def rpy_from_quaternion(x, y, z, w):
 
 
 def quaternion_from_rpy(roll, pitch, yaw):
+    """
+    Converts roll, pitch, and yaw angles to a quaternion.
+
+    Parameters:
+    - roll (float): The roll angle in radians.
+    - pitch (float): The pitch angle in radians.
+    - yaw (float): The yaw angle in radians.
+
+    Returns:
+    - list: A list containing the quaternion components [w, x, y, z].
+    """
     qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - \
         np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
     qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + \
@@ -31,7 +54,17 @@ def quaternion_from_rpy(roll, pitch, yaw):
 
 
 def calculate_rotation_matrix(x, y, z):
+    """
+    Calculates the rotation matrix from roll, pitch, and yaw angles.
 
+    Parameters:
+    - roll (float): The roll angle in radians.
+    - pitch (float): The pitch angle in radians.
+    - yaw (float): The yaw angle in radians.
+
+    Returns:
+    - np.ndarray: A 3x3 rotation matrix.
+    """
     yaw = np.array([[np.cos(z), -np.sin(z),  0],
                     [np.sin(z), np.cos(z), 0],
                     [0,         0,          1]])
@@ -50,7 +83,16 @@ def calculate_rotation_matrix(x, y, z):
 
 
 def create_transformation_matrix(rotation_matrix, translation_matrix):
+    """
+    Creates a 4x4 transformation matrix from rotation and translation.
 
+    Parameters:
+    - rotation_matrix (np.ndarray): A 3x3 rotation matrix.
+    - translation_vector (list): A list of x, y, z translations.
+
+    Returns:
+    - np.ndarray: A 4x4 transformation matrix.
+    """
     x, y, z = translation_matrix[0], translation_matrix[1], translation_matrix[2]
     p = np.array([[x], [y], [z], [1]])
 
@@ -60,6 +102,9 @@ def create_transformation_matrix(rotation_matrix, translation_matrix):
 
 
 class TagOdometryNode(Node):
+    """
+    ROS2 node for computing the odometry of a robot based on detected AprilTag poses.
+    """
     def __init__(self):
         super().__init__('tag_odometry_node')
 
@@ -84,6 +129,9 @@ class TagOdometryNode(Node):
         self.pose_pub = self.create_publisher(Odometry, '/tag_odom', 10)
 
     def load_camera_extrinsics(self):
+        """
+        Loads camera extrinsic parameters and AprilTag configurations from a YAML file.
+        """
         config_path = self.get_parameter(
             'tags_config').get_parameter_value().string_value
 
@@ -137,6 +185,12 @@ class TagOdometryNode(Node):
             self.destroy_node()
 
     def tag_detections_callback(self, msg):
+        """
+        Callback function for AprilTag detection messages. Processes the detections and publishes odometry information.
+
+        Parameters:
+        - msg (AprilTagDetectionArray): The detected AprilTags with their poses.
+        """
         tags_detected = len(msg.detections)
         if tags_detected == 0:
             return
@@ -168,6 +222,12 @@ class TagOdometryNode(Node):
         self.publish_matrix(T_BW)
 
     def publish_matrix(self, transformation_matrix):
+        """
+        Publishes the computed odometry from the transformation matrix.
+
+        Parameters:
+        - transformation_matrix (np.ndarray): A 4x4 transformation matrix representing the robot's pose.
+        """
 
         T = transformation_matrix
 
@@ -194,7 +254,17 @@ class TagOdometryNode(Node):
         self.pose_pub.publish(p)
 
     def calculate_drivebase_position(self, id, position, orientation):
+        """
+        Calculates the robot's position based on the detected tag and the camera-to-body transformation.
 
+        Parameters:
+        - tag_id (int): The ID of the detected tag.
+        - position (list): The position of the detected tag in the camera frame.
+        - orientation (list): The orientation of the detected tag in the camera frame.
+
+        Returns:
+        - np.ndarray: A 4x4 transformation matrix representing the robot's pose in the world frame.
+        """
         # Find apriltag_to_camera, then apriltag_to_body using detection info and camera_to_body parameter
         rotation_matrix = calculate_rotation_matrix(
             orientation[0], orientation[1], orientation[2])

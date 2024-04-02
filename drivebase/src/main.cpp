@@ -29,9 +29,10 @@ rclc_support_t support;
 rcl_allocator_t allocator;
 rcl_node_t node;
 
+// Indicate program running properly
 #define LED_PIN 2
 
-// Motor control definitions
+// Motor control pin definitions
 #define PIN_IN1 16
 #define PIN_IN2 17
 #define PIN_IN3 5
@@ -66,6 +67,7 @@ void error_loop() {
 // IMU
 MPU6050 mpu;
 
+// Physical constants
 #define EARTH_GRAVITY_MS2 9.80665  // m/s2
 #define DEG_TO_RAD        0.017453292519943295769236907684886
 #define RAD_TO_DEG        57.295779513082320876798154814105
@@ -78,7 +80,7 @@ uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
 uint16_t fifoCount;     // count of all bytes currently in FIFO
 uint8_t fifoBuffer[64]; // FIFO storage buffer
 
-// orientation/motion vars
+// Orientation/motion vars
 Quaternion q;           // [w, x, y, z]         quaternion container
 VectorInt16 aa;         // [x, y, z]            accel sensor measurements
 VectorInt16 gg;         // [x, y, z]            gyro sensor measurements
@@ -92,7 +94,13 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 rcl_publisher_t imu_publisher;
 sensor_msgs__msg__Imu imu_msg;
 
-
+/**
+ * Translate integer values to chassis movement command
+ *
+ * @param command: integer command of desired action
+ * @param speed: PWM speed value (0-255)
+ * @return void
+ */
 void controlMotors(int command, int speed = 255) {
   if (command == FWD) { // forward
     digitalWrite(PIN_IN1, HIGH);
@@ -167,6 +175,12 @@ void controlMotors(int command, int speed = 255) {
   }
 }
 
+/**
+ * Callback function for subscriber
+ * 
+ * @param msgin: pointer to incoming message
+ * @return void
+*/
 void subscription_callback(const void * msgin)
 {  
   const std_msgs__msg__Int32 * msg = (const std_msgs__msg__Int32 *)msgin;
@@ -180,7 +194,10 @@ void subscription_callback(const void * msgin)
 }
 
 
-// Setup function for micro-ROS
+/** Setup function for micro-ROS
+ * 
+ * @return void
+ * */ 
 void setup() {
   #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
     Wire.begin();

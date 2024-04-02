@@ -11,6 +11,9 @@ import math
 
     
 class IMUToOdometry(Node):
+    """
+    A ROS node to convert IMU readings to Odometry messages.
+    """
     def __init__(self):
         super().__init__('imu_to_odometry')
         self.imu_sub = self.create_subscription(
@@ -43,6 +46,15 @@ class IMUToOdometry(Node):
         self.yaw = 0.0
 
     def euler_to_quaternion(self, roll, pitch, yaw):
+        """
+        Convert Euler angles to a quaternion.
+
+        Parameters:
+        - roll, pitch, yaw: Euler angles in radians.
+
+        Returns:
+        - Quaternion: Quaternion representation of the Euler angles.
+        """
         # assume zero roll and pitch (2D world)
         roll = 0.0
         pitch = 0.0
@@ -60,6 +72,12 @@ class IMUToOdometry(Node):
         roll is rotation around x in radians (counterclockwise)
         pitch is rotation around y in radians (counterclockwise)
         yaw is rotation around z in radians (counterclockwise)
+
+        Parameters:
+        - x, y, z, w: Components of the quaternion.
+
+        Returns:
+        - Tuple of Euler angles (roll_x, pitch_y, yaw_z) in radians.
         """
         t0 = +2.0 * (w * x + y * z)
         t1 = +1.0 - 2.0 * (x * x + y * y)
@@ -78,6 +96,12 @@ class IMUToOdometry(Node):
 
 
     def command_callback(self, msg):
+        """
+        Callback for robot movement commands.
+
+        Parameters:
+        - msg: The command message indicating the movement direction.
+        """
         # determine if the robot is moving:
         # forward: 1
         # backward: 2
@@ -95,6 +119,12 @@ class IMUToOdometry(Node):
         return
 
     def imu_callback(self, msg):
+        """
+        Callback for processing IMU data.
+
+        Parameters:
+        - msg: IMU message containing orientation data.
+        """
         current_time = time.time()
         dt = current_time - self.last_time
         self.last_time = current_time

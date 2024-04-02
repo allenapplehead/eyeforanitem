@@ -1,22 +1,20 @@
 # Camera Extrinsics
 
-t_B_CB:      [ 0.62, -0.147, 0.01 ]          # camera in body center [m]
-# R_B_C:      [[ -1.0, 0.0, 0.0 ],
-#              [ 0.0, 0.0, 1.0 ],
-#              [0.0, 1.0, 0.0 ]]          # camera in body center [m]
+t_B_CB:      [ 0.62, -0.147, 0.01 ]           # translation from body to camera in body frame
+
 R_B_C:      [[ -1.0, 0.0, 0.0 ],
              [ 0.0, -0.1, 0.995 ],
-             [0.0, 0.995, 0.1 ]]          # camera nods slightly downwards
+             [0.0, 0.995, 0.1 ]]              # rotation matrix from camera to body frame
 
 num_tags: 4
 
 tag_id_0: 0
-tag_position_0:      [ 1.05, 0.38, 0.37 ]  # x, y, z [m]
-tag_rotation_0:      [ 90.0, 0.0, 180.0 ]  # roll, pitch, yaw [degrees]
+tag_position_0:      [ 1.05, 0.38, 0.37 ]     # x, y, z [m]
+tag_rotation_0:      [ 90.0, 0.0, 180.0 ]     # roll, pitch, yaw [degrees]
 
 tag_id_1: 1
-tag_position_1:      [ 4.65, 0.13, 0.39 ]          # x, y, z [m]
-tag_rotation_1:      [ 90.0, 0.0, 180.0 ]          # roll, pitch, yaw [degrees]
+tag_position_1:      [ 4.65, 0.13, 0.39 ]     # x, y, z [m]
+tag_rotation_1:      [ 90.0, 0.0, 180.0 ]     # roll, pitch, yaw [degrees]
 
 tag_id_2: 2
 tag_position_2:      [ 3.08, 1.92, 0.405 ]
