@@ -3,6 +3,8 @@ Project Link: https://hackster.io/ceyeber/an-eye-for-an-item-9162a7
 
 For instructions to set up this project, please go to the [Wiki](https://github.com/allenapplehead/eyeforanitem/wiki)
 
+<a href="https://youtu.be/KAUH67vni74" target="_blank"><img src="https://img.youtube.com/vi/KAUH67vni74/0.jpg"></a>
+
 ## Repo Organization and Architecture Diagrams
 To better make sense of the structure of this repository, please refer to the diagrams below:
 
