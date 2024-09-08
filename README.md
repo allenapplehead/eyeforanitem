@@ -22,7 +22,7 @@ Contains the Dockerfile based off of `dustynv/ros:humble-desktop-l4t-r35.2.1`, w
 ### [`/drivebase`](/drivebase)
 Contains platformio project for ESP32, featuring IMU and motor control features, integrated through ROS to allow it to talk to the Jetson Orin via serial.
 
-### [`/jetson-containers`](/jetson-container)
+### [`/jetson-containers`](/jetson-containers)
 Submodule. Fork of the [official jetson-containers project](https://github.com/dusty-nv/jetson-containers). Particular containers of interest include ROS2 Humble and Nanodb.
 
 ### [`/robot_ws/src`](/robot_ws/src)
